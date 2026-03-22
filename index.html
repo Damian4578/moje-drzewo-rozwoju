@@ -13,14 +13,44 @@
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>POZIOM ŚWIATŁA</h1>
-        <div class="value" id="lightValue">500</div>
-        <div class="status" id="statusLabel">SYSTEM AKTYWNY</div>
-        <input type="range" min="0" max="1023" value="500" oninput="updateView(this.value)">
-        <p style="font-size: 0.7rem; color: #64748b; margin-top: 1rem;">Symulator Interfejsu Projektu</p>
-    </div>
+<div class="card">
+    <h1>KONTROLA ROLET</h1>
+    <div class="value" id="lightValue">500</div>
+    <div class="status" id="statusLabel">TRYB AUTOMATYCZNY</div>
+    
+    <input type="range" min="0" max="1023" value="500" oninput="updateView(this.value)">
+    
+    <button id="modeBtn" onclick="toggleMode()" style="margin-top: 20px; padding: 10px 20px; border-radius: 10px; cursor: pointer; background: #38bdf8; border: none; font-weight: bold;">
+        PRZEŁĄCZ NA MANUAL
+    </button>
+</div>
 
+<script>
+    let isManual = false;
+
+    function toggleMode() {
+        isManual = !isManual;
+        const btn = document.getElementById('modeBtn');
+        const status = document.getElementById('statusLabel');
+        
+        if(isManual) {
+            btn.innerText = "PRZEŁĄCZ NA AUTO";
+            btn.style.background = "#f87171";
+            status.innerText = "TRYB: WYMUSZONE ZAMKNIĘCIE";
+            document.getElementById('lightValue').innerText = "0";
+        } else {
+            btn.innerText = "PRZEŁĄCZ NA MANUAL";
+            btn.style.background = "#38bdf8";
+            status.innerText = "TRYB AUTOMATYCZNY";
+        }
+    }
+
+    function updateView(val) {
+        if(!isManual) {
+            document.getElementById('lightValue').innerText = val;
+        }
+    }
+</script>
     <script>
         function updateView(val) {
             document.getElementById('lightValue').innerText = val;
