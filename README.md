@@ -4,7 +4,7 @@ To jest moje "Drzewo Postępu" – projekt, w którym wykorzystuję **Sztuczną 
 
 ## 🛠 Cel Projektu
 - Budowa produktów opartych na nowej technologii bez nakładów finansowych.
-- Dokumentowanie nauki elektroniki i robotyki poprzez symulatory (Wokwi).
+- Dokumentowanie nauki elektroniki i robotyki poprzez symulatory (Wokwi). wokwi.com
 - Wykorzystanie AI jako głównego inżyniera i mentora.
 
 ## 📁 Zawartość Repozytorium
