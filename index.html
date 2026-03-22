@@ -2,68 +2,105 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Smart Home Dashboard</title>
+    <title>Smart Home Dashboard v2.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e293b; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.5); text-align: center; width: 300px; border: 1px solid #334155; }
-        h1 { font-size: 1.2rem; color: #94a3b8; }
-        .value { font-size: 3rem; font-weight: bold; margin: 1rem 0; color: #38bdf8; }
-        .status { padding: 0.5rem 1rem; border-radius: 50px; background: #064e3b; color: #4ade80; font-size: 0.8rem; }
-        input { width: 100%; margin-top: 2rem; cursor: pointer; }
+        body { background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { width: 100%; max-width: 600px; }
+        .card { background: #1e293b; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; border: 1px solid #334155; margin-bottom: 20px; }
+        h1 { font-size: 1.2rem; color: #94a3b8; letter-spacing: 2px; }
+        .value { font-size: 3.5rem; font-weight: bold; margin: 1rem 0; color: #38bdf8; }
+        .status { padding: 0.6rem 1.2rem; border-radius: 50px; background: #064e3b; color: #4ade80; font-size: 0.9rem; font-weight: bold; }
+        input[type=range] { width: 100%; margin: 2rem 0; accent-color: #38bdf8; }
+        button { width: 100%; padding: 12px; border-radius: 12px; cursor: pointer; background: #38bdf8; border: none; font-weight: bold; color: #0f172a; transition: 0.3s; }
+        button:hover { background: #7dd3fc; transform: scale(1.02); }
+        .chart-container { background: #1e293b; padding: 1.5rem; border-radius: 20px; border: 1px solid #334155; }
     </style>
 </head>
 <body>
-<div class="card">
-    <h1>KONTROLA ROLET</h1>
-    <div class="value" id="lightValue">500</div>
-    <div class="status" id="statusLabel">TRYB AUTOMATYCZNY</div>
-    
-    <input type="range" min="0" max="1023" value="500" oninput="updateView(this.value)">
-    
-    <button id="modeBtn" onclick="toggleMode()" style="margin-top: 20px; padding: 10px 20px; border-radius: 10px; cursor: pointer; background: #38bdf8; border: none; font-weight: bold;">
-        PRZEŁĄCZ NA MANUAL
-    </button>
-</div>
+    <div class="container">
+        <div class="card">
+            <h1>MONITOR ŚWIATŁA</h1>
+            <div class="value" id="lightValue">512</div>
+            <div id="statusLabel" class="status">SYSTEM AKTYWNY</div>
+            
+            <input type="range" min="0" max="1023" value="512" oninput="updateAll(this.value)">
+            
+            <button id="modeBtn" onclick="toggleMode()">PRZEŁĄCZ NA TRYB NOCNY (MANUAL)</button>
+        </div>
 
-<script>
-    let isManual = false;
+        <div class="chart-container">
+            <canvas id="lightChart"></canvas>
+        </div>
+    </div>
 
-    function toggleMode() {
-        isManual = !isManual;
-        const btn = document.getElementById('modeBtn');
-        const status = document.getElementById('statusLabel');
-        
-        if(isManual) {
-            btn.innerText = "PRZEŁĄCZ NA AUTO";
-            btn.style.background = "#f87171";
-            status.innerText = "TRYB: WYMUSZONE ZAMKNIĘCIE";
-            document.getElementById('lightValue').innerText = "0";
-        } else {
-            btn.innerText = "PRZEŁĄCZ NA MANUAL";
-            btn.style.background = "#38bdf8";
-            status.innerText = "TRYB AUTOMATYCZNY";
-        }
-    }
-
-    function updateView(val) {
-        if(!isManual) {
-            document.getElementById('lightValue').innerText = val;
-        }
-    }
-</script>
     <script>
-        function updateView(val) {
-            document.getElementById('lightValue').innerText = val;
+        let isManual = false;
+        const ctx = document.getElementById('lightChart').getContext('2d');
+        
+        // Inicjalizacja Wykresu
+        const lightChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Czas/Próbki
+                datasets: [{
+                    label: 'Natężenie światła (LDR)',
+                    data: [],
+                    borderColor: '#38bdf8',
+                    backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, max: 1024, grid: { color: '#334155' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        function toggleMode() {
+            isManual = !isManual;
+            const btn = document.getElementById('modeBtn');
             const status = document.getElementById('statusLabel');
-            if(val < 500) {
-                status.innerText = "ZASILANIE AWARYJNE: ON";
-                status.style.background = "#7f1d1d";
+            
+            if(isManual) {
+                btn.innerText = "PRZEŁĄCZ NA TRYB AUTO";
+                btn.style.background = "#f87171";
+                status.innerText = "WYMUSZONE ZAMKNIĘCIE";
+                status.style.background = "#450a0a";
                 status.style.color = "#f87171";
+                updateAll(0);
             } else {
+                btn.innerText = "PRZEŁĄCZ NA TRYB NOCNY (MANUAL)";
+                btn.style.background = "#38bdf8";
                 status.innerText = "SYSTEM AKTYWNY";
                 status.style.background = "#064e3b";
                 status.style.color = "#4ade80";
             }
+        }
+
+        function updateAll(val) {
+            document.getElementById('lightValue').innerText = val;
+            
+            // Dodawanie danych do wykresu
+            const now = new Date();
+            const timeLabel = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+            
+            lightChart.data.labels.push(timeLabel);
+            lightChart.data.datasets[0].data.push(val);
+
+            // Zachowaj tylko 10 ostatnich pomiarów, żeby wykres był czytelny
+            if(lightChart.data.labels.length > 10) {
+                lightChart.data.labels.shift();
+                lightChart.data.datasets[0].data.shift();
+            }
+            
+            lightChart.update();
         }
     </script>
 </body>
