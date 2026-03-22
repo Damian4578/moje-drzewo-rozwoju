@@ -27,7 +27,7 @@ W poniższych plikach zapisałem każdy etap powstawania systemu:
 - [x] **Etap 5:** Fizyczna Akcja - Implementacja serwomechanizmu (Roleta).
 - [x] **Etap 6:** User Interface - Budowa Dashboardu w HTML/CSS.
 - [x] **Etap 7:** Bezpieczeństwo - Obsługa przycisku (Manual Override).
-- [ ] **Etap 8:** Analityka - Dodanie wykresów zmian światła na Dashboardzie.
+- [x] **Etap 8:** Analityka - Dodanie wykresów zmian światła na Dashboardzie.
 
 ## 🏗 Architektura Systemu (Jak to działa?)
 1. **Warstwa Percepcji:** Fotorezystor (LDR) mierzy natężenie światła otoczenia.
